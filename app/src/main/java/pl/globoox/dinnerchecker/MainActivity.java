@@ -7,8 +7,10 @@ import android.util.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import pl.globoox.dinnerchecker.Utilities.DownloadWebpage;
 
@@ -22,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-
+        final ArrayList<String> list = new ArrayList<>();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -30,10 +32,20 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     Document doc = Jsoup.connect("http://www.piotr-lubawka.pl").get();
-                    Element masthead = doc.select("div.post-content").first();
-                    String dinner = masthead.text();
+                    Elements masthead = doc.select("div.post-content").select("p");
+                    for (Element el : masthead) {
+                        list.add(String.valueOf(el));
+                    }
 
-                    Log.d("TAG", String.valueOf(dinner));
+                    String data = list.get(1);
+                    Log.d("TAG", data);
+                    for (int i = 3; i < 12; i++) {
+                        String dinner = list.get(i);
+                        dinner = dinner.replaceAll("&nbsp;", "");
+                        dinner = dinner.replaceAll("<p>", "");
+                        dinner = dinner.replaceAll("</p>", "");
+                        Log.d("TAG", dinner);
+                    }
 
 
                 } catch (IOException e) {
@@ -42,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }).start();
-
 
 
     }
